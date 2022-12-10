@@ -45,7 +45,8 @@ def check_tokens():
     massive = [TELEGRAM_TOKEN, PRACTICUM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT]
     for i in massive:
         if not i:
-            logging.critical(f'Отсутствие обязательных переменных {i} окружения во время запуска бота ')
+            logging.critical('Отсутствие обязательных переменных '
+                             f'{i} окружения во время запуска бота ')
             return False
     return True
 
