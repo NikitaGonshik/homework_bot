@@ -67,7 +67,11 @@ def get_api_answer(timestamp):
     """Запрос к Api."""
     current_timestamp = timestamp
     payload = {'from_date': current_timestamp}
-    homework_statuses = requests.get(ENDPOINT, headers=HEADERS, params=payload)
+    try:
+        homework_statuses = requests.get(ENDPOINT, headers=HEADERS,
+                                         params=payload)
+    except requests.exceptions.RequestException as error:
+        raise exceptions.PracticumAPIError(f'Ошибка запроса {error}')
     if homework_statuses.status_code == 400:
         logging.error('Недоступность эндпоинта')
         raise exceptions.PracticumAPIError('Api Yandex не работает')
@@ -83,20 +87,36 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверка ответа Json."""
+    logging.info('Начало проверки ответа сервера')
     try:
+        value = response['homeworks']
+    except KeyError:
+        raise KeyError('Нет ключа в словаре')
+    if type(response['homeworks']) != list:
+        raise TypeError('Не список')
+    if 'code' in response:
+        raise exceptions.PracticumAPIError('Ошибка ответа API сервера')
+    if response['homeworks']:
         return response['homeworks'][0]
-    except Exception as error:
-        raise exceptions.ListError(f'Ошибка проверки{error}')
+    else:
+        raise IndexError('Пустой список')
 
 
 def parse_status(homework):
     """Проверка статуса домашней работы."""
-    status = homework["status"]
-    homework_name = homework["homework_name"]
-    if status not in HOMEWORK_VERDICTS:
-        logging.error('Неожиданный статус домашней работы')
-        raise NameError('Неверный статус')
-    verdict = HOMEWORK_VERDICTS[status]
+    WRONG_DATA_TYPE = 'Неверный тип данных {type}, вместо "dict"'
+    if not isinstance(homework, dict):
+        raise exceptions.DataTypeError(WRONG_DATA_TYPE.format(type(homework)))
+    homework_status = homework.get('status')
+    homework_name = homework.get('homework_name')
+    if 'homework_name' not in homework:
+        raise Exception('Ошибка названия домашки')
+
+    if homework_status not in HOMEWORK_VERDICTS:
+        logging.error('Неверный статус домашки')
+        raise NameError('Неверный статус домашки')
+
+    verdict = HOMEWORK_VERDICTS[homework_status]
 
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
