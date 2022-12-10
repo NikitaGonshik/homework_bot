@@ -41,7 +41,7 @@ handler.setFormatter(formatter)
 
 
 def check_tokens():
-    """Проверка что все токены есть"""
+    """Проверка что все токены есть."""
     massive = [TELEGRAM_TOKEN, PRACTICUM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT]
     for i in massive:
         if not i:
@@ -52,7 +52,7 @@ def check_tokens():
 
 
 def send_message(bot, message):
-    """Отправка сообщения ботом"""
+    """Отправка сообщения ботом."""
     chat_id = TELEGRAM_CHAT_ID
     text = message
     try:
@@ -64,7 +64,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(timestamp):
-    """ Запрос к Api """
+    """Запрос к Api."""
     current_timestamp = timestamp
     payload = {'from_date': current_timestamp}
     homework_statuses = requests.get(ENDPOINT, headers=HEADERS, params=payload)
@@ -82,7 +82,7 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """Проверка ответа Json"""
+    """Проверка ответа Json."""
     try:
         return response['homeworks'][0]
     except Exception as error:
@@ -90,7 +90,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Проверка статуса домашней работы"""
+    """Проверка статуса домашней работы."""
     status = homework["status"]
     homework_name = homework["homework_name"]
     if status not in HOMEWORK_VERDICTS:

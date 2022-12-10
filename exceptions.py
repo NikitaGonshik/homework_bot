@@ -5,21 +5,21 @@ class PracticumAPIError(Exception):
 
 
 class TokenError(Exception):
-    '''Ошибка в переменных окружения'''
+    '''Ошибка в переменных окружения.'''
 
     pass
 
 
 class SendmessageError(Exception):
-    '''Ошибка отправки сообщения'''
+    '''Ошибка отправки сообщения.'''
     pass
 
 
 class ListError(Exception):
-    '''Ошибка проверки списка jason'''
+    '''Ошибка проверки списка jason.'''
     pass
 
 
 class FormatError(Exception):
-    '''Ошибка формата Json'''
+    '''Ошибка формата Json.'''
     pass
