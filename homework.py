@@ -96,7 +96,7 @@ def check_response(response):
         raise TypeError('Не список')
     if 'code' in response:
         raise exceptions.PracticumAPIError('Ошибка ответа API сервера')
-    if response['homeworks']:
+    if value:
         return response['homeworks'][0]
     else:
         raise IndexError('Пустой список')
