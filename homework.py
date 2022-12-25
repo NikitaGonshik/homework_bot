@@ -6,6 +6,7 @@ from logging import StreamHandler
 import requests
 import telegram
 from dotenv import load_dotenv
+from http import HTTPStatus
 
 import exceptions
 
@@ -14,9 +15,10 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+ENDPOINT = os.getenv('ENDPOINT')
 
 RETRY_PERIOD = 600
-ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
+
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
@@ -42,23 +44,23 @@ handler.setFormatter(formatter)
 
 def check_tokens():
     """Проверка что все токены есть."""
-    massive = [TELEGRAM_TOKEN, PRACTICUM_TOKEN, TELEGRAM_CHAT_ID, ENDPOINT]
-    for i in massive:
-        if not i:
-            logging.critical('Отсутствие обязательных переменных '
-                             f'{i} окружения во время запуска бота ')
-            return False
-    return True
+    if all([TELEGRAM_TOKEN, PRACTICUM_TOKEN,
+            TELEGRAM_CHAT_ID, ENDPOINT]) is False:
+        logging.critical('Отсутствие обязательных переменных '
+                         'окружения во время запуска бота')
+        return False
+    else:
+        return True
 
 
 def send_message(bot, message):
     """Отправка сообщения ботом."""
-    chat_id = TELEGRAM_CHAT_ID
     text = message
+    logging.info('Попытка отправки сообщения')
     try:
-        logging.debug(f'Отправка сообщения {text}')
-        bot.send_message(chat_id, text)
-    except Exception as error:
+        bot.send_message(TELEGRAM_CHAT_ID, text)
+        logging.debug(f'Отправил сообщения {text}')
+    except telegram.error.TelegramError as error:
         logging.error(f'Сбой в работе программы: {error}')
         raise exceptions.SendmessageError(f'Ошибка отправки сообщения{error}')
 
@@ -72,10 +74,10 @@ def get_api_answer(timestamp):
                                          params=payload)
     except requests.exceptions.RequestException as error:
         raise exceptions.PracticumAPIError(f'Ошибка запроса {error}')
-    if homework_statuses.status_code == 400:
+    if homework_statuses.status_code == HTTPStatus.BAD_REQUEST:
         logging.error('Недоступность эндпоинта')
         raise exceptions.PracticumAPIError('Api Yandex не работает')
-    if homework_statuses.status_code != 200:
+    if homework_statuses.status_code != HTTPStatus.OK:
         logging.error('сбои при запросе к эндпоинту ',
                       f'{homework_statuses.status_code}')
         raise exceptions.PracticumAPIError('Api запрос Yandex не проходит')
@@ -92,7 +94,7 @@ def check_response(response):
         value = response['homeworks']
     except KeyError:
         raise KeyError('Нет ключа в словаре')
-    if type(response['homeworks']) != list:
+    if not isinstance(response['homeworks'], list):
         raise TypeError('Не список')
     if 'code' in response:
         raise exceptions.PracticumAPIError('Ошибка ответа API сервера')
@@ -115,6 +117,8 @@ def parse_status(homework):
     if homework_status not in HOMEWORK_VERDICTS:
         logging.error('Неверный статус домашки')
         raise NameError('Неверный статус домашки')
+    if 'current_date' in homework:
+        raise Exception('Ошибка возврата времени')
 
     verdict = HOMEWORK_VERDICTS[homework_status]
 
