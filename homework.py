@@ -129,7 +129,7 @@ def main():
     """Основная логика работы бота."""
     answer = ''
     if not check_tokens():
-        raise exceptions.TokenError('Ошибка токена')
+        raise Exception('Ошибка токена')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     timestamp = int(time.time())
 
