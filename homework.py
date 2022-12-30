@@ -99,7 +99,7 @@ def check_response(response):
     if value:
         return response['homeworks'][0]
     else:
-        raise IndexError('Пустой список') 
+        raise IndexError('Пустой список')
 
 
 def parse_status(homework):
