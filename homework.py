@@ -99,7 +99,7 @@ def check_response(response):
     if value:
         return response['homeworks'][0]
     else:
-        raise IndexError('Пустой список')
+        raise IndexError('Пустой список') 
 
 
 def parse_status(homework):
@@ -123,32 +123,32 @@ def parse_status(homework):
 
 def main():
     """Основная логика работы бота."""
-    answer = ''
+    prev_message = ''
     if not check_tokens():
         raise exceptions.TokenError('Ошибка токена')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
-    timestamp = int(time.time())
+    current_timestamp = int(time.time())
 
     while True:
         try:
-            response = get_api_answer(timestamp)
-            message = parse_status(check_response(get_api_answer(timestamp)))
-            if answer != message:
-                send_message(bot, parse_status(check_response(
-                             get_api_answer(timestamp))))
-            timestamp = response.get('current_date')
+            response = get_api_answer(current_timestamp)
+            homework = check_response(response)
+            message = parse_status(homework)
+            if prev_message != message:
+                send_message(bot, message)
+            logging.info(homework)
+            current_timestamp = response.get('current_date')
         except IndexError:
-            message = 'Статус работ не изменился'
-            if answer != message:
-                send_message(bot, parse_status(check_response(
-                             get_api_answer(timestamp))))
-            logging.debug('В ответе нет новых статусов')
+            message = 'Статус работы не изменился'
+            if prev_message != message:
+                send_message(bot, message)
+            logging.debug('В ответе нет новых статусов.')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             send_message(bot, message)
             logging.error(message)
         finally:
-            answer = message
+            prev_message = message
             time.sleep(RETRY_PERIOD)
 
 
