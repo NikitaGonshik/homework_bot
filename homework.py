@@ -14,9 +14,9 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+ENDPOINT = os.getenv('ENDPOINT')
 
 RETRY_PERIOD = 600
-ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
@@ -25,19 +25,6 @@ HOMEWORK_VERDICTS = {
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename='main.log',
-    format='%(asctime)s, %(levelname)s, %(message)s'
-)
-logger = logging.getLogger(__name__)
-handler = StreamHandler()
-logger.addHandler(handler)
-formatter = logging.Formatter(
-    '%(asctime)s [%(levelname)s] %(message)s'
-)
-handler.setFormatter(formatter)
 
 
 def check_tokens():
@@ -153,4 +140,16 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(
+    level=logging.DEBUG,
+    filename='main.log',
+    format='%(asctime)s, %(levelname)s, %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    handler = StreamHandler()
+    logger.addHandler(handler)
+    formatter = logging.Formatter(
+        '%(asctime)s [%(levelname)s] %(message)s'
+    )
+    handler.setFormatter(formatter)
     main()
