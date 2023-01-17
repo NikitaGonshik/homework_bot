@@ -24,6 +24,7 @@ class FormatError(Exception):
     '''Ошибка формата Json.'''
     pass
 
+
 class DataTypeError(Exception):
     """Неверныйй тип данных"""
     pass
