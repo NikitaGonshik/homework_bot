@@ -18,7 +18,6 @@ PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN', default='y0_AgAAAAAn'
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', default=442825837)
 ENDPOINT = os.getenv('ENDPOINT', default='https://practicum.yandex.ru/'
                      'api/user_api/homework_statuses/')
-                
 
 
 RETRY_PERIOD = 600
